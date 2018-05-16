@@ -15,6 +15,7 @@ public class GenericRecordExamples {
 
     public static void main(String[] args) {
 
+        //step 0: define schema
         Schema.Parser parser = new Schema.Parser();
         Schema schema = parser.parse("{\n" +
                 "     \"type\": \"record\",\n" +
@@ -31,6 +32,7 @@ public class GenericRecordExamples {
                 "}");
 
 
+        // step 1: create a generic record
         // we build our first customer
         GenericRecordBuilder customerBuilder = new GenericRecordBuilder(schema);
         customerBuilder.set("first_name", "John");
@@ -71,31 +73,37 @@ public class GenericRecordExamples {
             e.printStackTrace();
         }
 
+        // step 2: write record to a file
         // writing to a file
         final DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
         try (DataFileWriter<GenericRecord> dataFileWriter = new DataFileWriter<>(datumWriter)) {
             dataFileWriter.create(myCustomer.getSchema(), new File("customer-generic.avro"));
             dataFileWriter.append(myCustomer);
+            dataFileWriter.append(customerWithDefault);
             System.out.println("Written customer-generic.avro");
         } catch (IOException e) {
             System.out.println("Couldn't write file");
             e.printStackTrace();
         }
 
+        // step 3: read record from a file
         // reading from a file
         final File file = new File("customer-generic.avro");
         final DatumReader<GenericRecord> datumReader = new GenericDatumReader<>();
         GenericRecord customerRead;
         try (DataFileReader<GenericRecord> dataFileReader = new DataFileReader<>(file, datumReader)){
-            customerRead = dataFileReader.next();
-            System.out.println("Successfully read avro file");
-            System.out.println(customerRead.toString());
+            while(dataFileReader.hasNext()){
+                System.out.println("=======================");
+                customerRead = dataFileReader.next();
+                System.out.println("Successfully read avro file");
+                System.out.println(customerRead.toString());
 
-            // get the data from the generic record
-            System.out.println("First name: " + customerRead.get("first_name"));
+                // get the data from the generic record
+                System.out.println("First name: " + customerRead.get("first_name"));
 
-            // read a non existent field
-            System.out.println("Non existent field: " + customerRead.get("not_here"));
+                // read a non existent field
+                System.out.println("Non existent field: " + customerRead.get("not_here"));
+            }
         }
         catch(IOException e) {
             e.printStackTrace();

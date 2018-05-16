@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # put this in any directory you like
 wget http://central.maven.org/maven2/org/apache/avro/avro-tools/1.8.2/avro-tools-1.8.2.jar
 

@@ -15,6 +15,7 @@ public class SpecificRecordExamples {
 
     public static void main(String[] args) {
 
+        // step 1: create specific record
         // we can now build a customer in a "safe" way
         Customer.Builder customerBuilder = Customer.newBuilder();
         customerBuilder.setAge(30);
@@ -27,7 +28,7 @@ public class SpecificRecordExamples {
         Customer customer = customerBuilder.build();
         System.out.println(customer.toString());
 
-
+        // step 2: write to a file
         // write it out to a file
         final DatumWriter<Customer> datumWriter = new SpecificDatumWriter<>(Customer.class);
 
@@ -40,7 +41,7 @@ public class SpecificRecordExamples {
         }
 
 
-        // read it from a file
+        // step 3: read it from a file
         final File file = new File("customer-specific.avro");
         final DatumReader<Customer> datumReader = new SpecificDatumReader<>(Customer.class);
         final DataFileReader<Customer> dataFileReader;
@@ -48,6 +49,7 @@ public class SpecificRecordExamples {
             System.out.println("Reading our specific record");
             dataFileReader = new DataFileReader<>(file, datumReader);
             while (dataFileReader.hasNext()) {
+                // step 4: interpret record
                 Customer readCustomer = dataFileReader.next();
                 System.out.println(readCustomer.toString());
                 System.out.println("First name: " + readCustomer.getFirstName());
